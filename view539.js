@@ -1,9 +1,10 @@
 const puppeteer = require('puppeteer');
 const internal = require('stream');
 const fs = require('fs');
+const util = require('./Util.js');
 
 (async ()=>{
-    var dir = './log/';
+    var dir = `${__dirname}\\log\\`;
     if (!fs.existsSync(dir))fs.mkdirSync(dir);
     let fileName = `${dir}history539.txt`;
 
@@ -52,14 +53,15 @@ const fs = require('fs');
     }
     await browser.close();
 
-    //存檔
-    fs.writeFile(fileName, JSON.stringify(listTotal).replace(/,{/g,",\n{"), 
-        function (err) {
-        if (err) return console.log(err);
-        });
-
     //統計
-    staticLotto(period,listTotal);        
+    let static = staticLotto(period,listTotal);
+    let resultData = static.join('\n') + "\n\n接收資料\n" + JSON.stringify(listTotal).replace(/,{/g,",\n{") 
+
+    //存檔
+    util.saveFile(fileName, resultData)
+    
+    //開啟檔案
+    util.execCmd("explorer", [fileName]);
 })()
 
 /*
@@ -68,6 +70,7 @@ listTotal : 原數據
 */
 function staticLotto(period,listTotal){
     if (period > listTotal.length) throw Error("數據不足");
+    let result = []
     
     //初始化39個號碼組，初始值為0
     let statics = Array(39).fill(0);
@@ -75,9 +78,9 @@ function staticLotto(period,listTotal){
     //只取期數(period)的資料
     listTotal = listTotal.slice(0,period); 
 
-    console.log('今彩539數據分析');
-    console.log(`統計期間 ${listTotal[listTotal.length-1].date} ~ ${listTotal[0].date} 共 ${period} 期\n`);
-    listTotal.forEach(x=>console.log(x.date,x.lottos));
+    result.push('今彩539數據分析')
+    result.push(`統計期間 ${listTotal[listTotal.length-1].date} ~ ${listTotal[0].date} 共 ${period} 期\n`)
+    listTotal.forEach(x=>result.push(`${x.date} ${x.lottos}`));
 
     //統計每個號碼的出現次數
     listTotal.forEach(day => {
@@ -90,8 +93,7 @@ function staticLotto(period,listTotal){
 
     //按出現次數排序
     statics.sort((a,b)=> (a.count > b.count) ? -1 : (a.count < b.count) ? 1 : 0);
-    //console.log(statics);
-    console.log('');
+    result.push('')
 
     //出現次數排名
     let displayRange = statics.map(x=>x.count).filter((value,idx,self)=>self.indexOf(value) === idx);
@@ -99,7 +101,8 @@ function staticLotto(period,listTotal){
     displayRange.forEach(x=>{
         let everyNo = statics.filter(y=>y.count==x).map(y=>y.no);
         let everyNoTxt = everyNo.sort().join(', ');
-        console.log(`出現${x}次 >> ${everyNoTxt}`);
+        result.push(`出現${x}次 >> ${everyNoTxt}`);
     });
 
+    return result;
 }
