@@ -59,7 +59,7 @@ const util = require('./Util.js');
 
     //存檔
     util.saveFile(fileName, resultData)
-    
+
     //開啟檔案
     util.execCmd("explorer", [fileName]);
 })()
@@ -100,7 +100,7 @@ function staticLotto(period,listTotal){
     
     displayRange.forEach(x=>{
         let everyNo = statics.filter(y=>y.count==x).map(y=>y.no);
-        let everyNoTxt = everyNo.sort().join(', ');
+        let everyNoTxt = everyNo.sort((a,b)=> parseInt(a) - parseInt(b)).join(', ');
         result.push(`出現${x}次 >> ${everyNoTxt}`);
     });
 
