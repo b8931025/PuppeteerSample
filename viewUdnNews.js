@@ -63,7 +63,7 @@ const util = require('./Util.js');
     await page.goto(url);
     selector = "a[data-story_list='list_全球']"   
     subList = await page.$$eval(selector, el => {return el.map(input => {
-        let title = input.title != "" ? input.title : input.getAttribute("aria-label")
+        let title = input.title ? input.title : input.getAttribute("aria-label")
         return {title: title, url: input.href}
     })})
     allList = allList.concat(subList)
@@ -73,7 +73,7 @@ const util = require('./Util.js');
     await page.goto(url);
     selector = "a[data-story_list='list_要聞']"   
     subList = await page.$$eval(selector, el => {return el.map(input => {
-        let title = input.title != "" ? input.title : input.getAttribute("aria-label")
+        let title = input.title ? input.title : input.getAttribute("aria-label")
         return {title: title, url: input.href}
     })})
     allList = allList.concat(subList)
@@ -83,7 +83,7 @@ const util = require('./Util.js');
     await page.goto(url);
     selector = "a[data-story_list='list_社會']"
     subList = await page.$$eval(selector, el => {return el.map(input => {
-        let title = input.title != "" ? input.title : input.getAttribute("aria-label")
+        let title = input.title ? input.title : input.getAttribute("aria-label")
         return {title: title, url: input.href}
     })})
     allList = allList.concat(subList)
@@ -91,7 +91,7 @@ const util = require('./Util.js');
     await browser.close();
 
     //空字串、字數小於4、重複的都排除
-    allList = allList.filter((value, index, self) => value.title != null && value.title != "" && value.title.length > 4 && self.map(x=>x.title).indexOf(value.title) === index)
+    allList = allList.filter((value, index, self) => value.title && value.title.length > 4 && self.map(x=>x.title).indexOf(value.title) === index)
     //排序
     allList = allList.sort((a,b)=>{
         if (a.title > b.title) return 1;
