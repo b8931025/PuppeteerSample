@@ -1,10 +1,14 @@
 module.exports = {
-    //save file
-    saveFile : (path,value)=>{
-        require('fs').writeFile(path, value, 
-            function (err) {
-                if (err) return console.log(err);
-            });
+    /* save file
+        options:{
+            encoding: "utf8",
+            flag: "w",
+            mode: 0o666
+        }    
+    */
+    saveFile : (path,value,options)=>{
+        let callback = (err) => {if (err) return console.log(err)}
+        require('fs').writeFile(path, value, options, callback);
     },
     //delay ms
     sleep : (delay)=>{
