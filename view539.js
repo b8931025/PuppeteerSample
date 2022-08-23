@@ -104,5 +104,23 @@ function staticLotto(period,listTotal){
         result.push(`出現${x}次 >> ${everyNoTxt}`);
     });
 
+    result.push("")
+    //連續號統計
+    let listSeri = Array(listTotal[0].lottos.length).fill(0).map((val,idx)=>({connect:(idx+1),times:0,dates:[]}));
+    listTotal.forEach(x=>{
+        let unit = util.staticConnectNo(x.lottos)
+        unit.filter(y=>y.times != 0).forEach(y=>{
+            let tmp = listSeri[y.connect - 1]
+            tmp.times += y.times
+            tmp.dates.push(x.date)
+        })
+    })
+    listSeri = listSeri.filter(x=>x.times!=0)
+    listSeri.forEach(x=>{
+        result.push(`${x.connect}連號出現${x.times}次`)
+        x.dates.forEach(y=>result.push(y))
+        result.push('')
+    })
+
     return result;
 }

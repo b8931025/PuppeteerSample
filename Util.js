@@ -51,7 +51,31 @@ module.exports = {
                 }
             });
         });
-    },    
+    },  
+    //static connect number in array 
+    staticConnectNo: (source)=>{
+        //排序
+        source.sort((a,b)=>(a-b))
+      
+        let static = Array(source.length).fill(0)
+        let x = []
+        //統計前後相差為1的連號  ex:[2,5,6,7,9] => [0,1,1,0] => "0110"
+        for(i = 1;i < source.length;i++) x.push(((source[i] - source[i-1]) == 1) ? 1 : 0)
+        let content = x.join("")
+      
+        //由大至小，從最多的連1號開始計算
+        for(connectTime = source.length ; connectTime > 1; connectTime--){
+          //產生數個1
+          let manyOnes = "".padEnd(connectTime-1).replace(/ /g,"1")
+          //檢查是否有連號
+          if (content.indexOf(manyOnes) > -1) {
+            content = content.replace(manyOnes,"")
+            static[connectTime-1]++
+          }
+        }
+      
+        return static.map((val,idx)=>({connect:(idx+1),times:val}))
+      },  
   };
 
 
