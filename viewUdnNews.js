@@ -92,12 +92,13 @@ const util = require('./Util.js');
 
     //空字串、字數小於4、重複的都排除
     allList = allList.filter((value, index, self) => value.title && value.title.length > 4 && self.map(x=>x.title).indexOf(value.title) === index)
-    //排序
+    //排序 by title
     allList = allList.sort((a,b)=>{
         if (a.title > b.title) return 1;
         if (a.title < b.title) return -1;
         return 0;
     })
+    allList = allList.map((val,idx)=>{return {no:(idx+1),title:val.title,url:val.url}})
 
     //存檔
     util.saveFile(fileName, JSON.stringify(allList).replace(/,{/g,",\n{"))
