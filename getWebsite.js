@@ -15,10 +15,17 @@ const util = require('./Util.js');
     const browser = await puppeteer.launch({headless: true});
     const page = await browser.newPage();
     await page.goto(url);
+    let title = await page.title()
 
     //html = await page.$eval("body", elem => elem.innerHTML)
-    title = await page.$eval("body > main > div > section.wrapper-left.main-content__wrapper > section > h1", elem => elem.innerText)
-    txt = await page.$eval("body > main > div > section.wrapper-left.main-content__wrapper > section > article > div", elem => elem.innerText)
+    try{
+        title = await page.$eval("body > main > div > section.wrapper-left.main-content__wrapper > section > h1", elem => elem.innerText)
+        txt = await page.$eval("body > main > div > section.wrapper-left.main-content__wrapper > section > article > div", elem => elem.innerText)
+    }catch(e){
+        //該頁格式不符，產生錯誤，直接輸出完整html
+        console.log(e)
+        txt = await page.$eval("body", elem => elem.innerHTML)
+    }    
 
     browser.close()
 
