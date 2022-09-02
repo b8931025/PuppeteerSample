@@ -22,9 +22,15 @@ const util = require('./Util.js');
         title = await page.$eval("body > main > div > section.wrapper-left.main-content__wrapper > section > h1", elem => elem.innerText)
         txt = await page.$eval("body > main > div > section.wrapper-left.main-content__wrapper > section > article > div", elem => elem.innerText)
     }catch(e){
-        //該頁格式不符，產生錯誤，直接輸出完整html
+        //該頁格式不符，產生錯誤，直接輸出完整html和超連結清單
         console.log(e)
-        txt = await page.$eval("body", elem => elem.innerHTML)
+
+        allLink = await page.$$eval('a', (el) => {return el.map(input => {
+            let title = input.title ? input.title : input.getAttribute("aria-label") ? input.getAttribute("aria-label") : input.innerText.replace(/\n/g,'').replace(/^\s+|\s+$/g, '')
+            return {title: title, url: input.href}
+        })})
+
+        txt = JSON.stringify(allLink).replace(/,{/g,",\n{") + '\n\n<<html>>\n\n' + (await page.$eval("body", elem => elem.innerHTML))
     }    
 
     browser.close()
