@@ -38,6 +38,15 @@ const util = require('./Util.js');
             return {title: title, url: input.href}
         })})
 
+        //空字串、字數小於4、重複的都排除
+        allLink = allLink.filter((value, index, self) => value.title != "" && value.title.length > 4 && self.map(x=>x.title).indexOf(value.title) === index)
+        //排序 by title
+        allLink = allLink.sort((a,b)=>{
+            if (a.title > b.title) return 1;
+            if (a.title < b.title) return -1;
+            return 0;
+        })
+
         txt = JSON.stringify(allLink).replace(/,{/g,",\n{")
 
         allText = (await page.$eval("body", elem => elem.innerText))
@@ -47,8 +56,11 @@ const util = require('./Util.js');
 
     browser.close()
 
+    result = `<<${title}>>\n\n${txt}`
+    //console.log(result)
+
     //存檔
-    util.saveFile(pathHtml, `<<${title}>>\n\n${txt}`)
+    util.saveFile(pathHtml, result)
 
     //開啟檔案
     util.execCmd("explorer", [pathHtml]);
