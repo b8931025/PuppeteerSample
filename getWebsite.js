@@ -14,7 +14,15 @@ const util = require('./Util.js');
 
     const browser = await puppeteer.launch({headless: true});
     const page = await browser.newPage();
-    await page.goto(url);
+
+    try{
+        await page.goto(url);
+    }catch(e){
+        browser.close()
+        console.log(`發生連線錯誤:${e.originalMessage}`)
+        return
+    }
+
     let title = await page.title()
 
     //html = await page.$eval("body", elem => elem.innerHTML)
@@ -30,8 +38,12 @@ const util = require('./Util.js');
             return {title: title, url: input.href}
         })})
 
-        txt = JSON.stringify(allLink).replace(/,{/g,",\n{") + '\n\n<<html>>\n\n' + (await page.$eval("body", elem => elem.innerHTML))
-    }    
+        txt = JSON.stringify(allLink).replace(/,{/g,",\n{")
+
+        allText = (await page.$eval("body", elem => elem.innerText))
+
+        txt += '\n\n<<html>>\n\n' + allText
+    }
 
     browser.close()
 
