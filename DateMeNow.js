@@ -116,7 +116,9 @@ const headless = true;
     //年齡
     mem.age = await page.$eval("ul.list-unstyled.line-height-25:nth-child(1) > li:nth-child(3)", elem => elem.innerText.replace("年齡：","").replace(" 歲",""))
     //身高
-    mem.height = await page.$eval("ul.list-unstyled.line-height-25:nth-child(1) > li:nth-child(4)", elem => elem.innerText.replace("身高：","").replace(" cm",""))    
+    mem.height = await page.$eval("ul.list-unstyled.line-height-25:nth-child(1) > li:nth-child(4)", elem => elem.innerText.replace("身高：","").replace(" cm",""))
+    //主要約會地點
+    mem.branch = await page.$eval("#wrapper > section:nth-child(3) > div > div.col-md-8 > div:nth-child(3) > ul > li:nth-child(4)", elem => elem.innerText.replace("主要約會地點：",""))    
     //頭髮顏色
     mem.color = await page.$eval("ul.list-unstyled.line-height-25.margin-bottom-0 > li:nth-child(1) > span", elem => elem.innerText)
     //興趣取向 ??
@@ -169,6 +171,7 @@ const headless = true;
     let favorite = x.favorite
     let sport = x.sport
     let contact = x.contact
+    let branch = x.branch
     let desc = x.desc
     let urlIntro = x.urlIntro
     let urlImg = x.urlImg
@@ -176,7 +179,7 @@ const headless = true;
     let imgAvatar = x.imgAvatar
     let avatarDownloadSuccess  = x.avatarDownloadSuccess 
     
-    return { pageIndex, id, city, name, age, height, level, company, color, favorite, sport, contact, desc, urlIntro, urlImg, imgIntro, imgAvatar, avatarDownloadSuccess }
+    return { pageIndex, id, city,branch , name, age, height, level, company, color, favorite, sport, contact, desc, urlIntro, urlImg, imgIntro, imgAvatar, avatarDownloadSuccess }
   })
 
   //util.saveFile(pathTmp, await page.$eval("body", elem => elem.innerHTML))    //存下html
