@@ -122,5 +122,29 @@ function staticLotto(period,listTotal){
         result.push('')
     })
 
+    //出現次數(times)前三名，出現次數最多的取一個，其他取二個(amount)
+    let PickSet = [  {"times":displayRange[0], "amount":1}
+                    ,{"times":displayRange[1], "amount":2}
+                    ,{"times":displayRange[2], "amount":2}];
+                    
+    result.push(`推薦號碼`)
+    result.push(AdviceNOSet(PickSet,statics))
+    result.push(AdviceNOSet(PickSet,statics))    
+    result.push(AdviceNOSet(PickSet,statics))    
+
     return result;
+}
+
+//推薦號碼
+function AdviceNOSet(PickSet,statics){
+    let newNumber= [];
+    PickSet.forEach(set => {
+        let TimesArray = statics.filter(y => y.count == set.times);
+        //亂數排序
+        let RandomArray = TimesArray.sort((a,b)=>(0.5 - Math.random()));
+
+        for(let i = 0;i < set.amount;i++) newNumber.push(RandomArray[i].no);
+    })
+    //排序(小 > 大)
+    return newNumber.sort((a,b)=>(parseInt(a) > parseInt(b)) ? 1 : (parseInt(a) < parseInt(b)) ? -1 : 0).join(',');
 }

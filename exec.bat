@@ -1,3 +1,3 @@
 node .\viewUdnNews.js
-node .\view539.js
+rem node .\view539.js
 pause
