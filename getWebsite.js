@@ -57,11 +57,13 @@ const util = require('./Util.js');
     browser.close()
 
     result = `<<${title}>>\n\n${txt}`
-    //console.log(result)
+    console.log(result)
 
     //存檔
     util.saveFile(pathHtml, result)
 
     //開啟檔案
-    util.execCmd("explorer", [pathHtml]);
+    //util.execCmd("explorer", [pathHtml]);
+
+    //影音新聞，會有連線拒絕的問題
 })()
