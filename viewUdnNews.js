@@ -124,7 +124,7 @@ const downloadNews = async(dir)=>{
         const element = allList[i]
         console.log(element.no,element.title,element.url)
         if (((i+1) % pageSize) == 0){
-            await pause();
+            await util.pause('<<按任意鍵下一頁>>');
         }
     }
     process.exit();
@@ -149,7 +149,7 @@ const showList = async(dir)=>{
         const element = newsData[i]
         console.log(element.no,element.title,element.url)
         if (((i+1) % pageSize) == 0 && (i+1) != newsData.length){
-            await pause();
+            await util.pause('<<按任意鍵下一頁>>');
         }
     }
     process.exit();

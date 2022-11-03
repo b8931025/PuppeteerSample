@@ -52,7 +52,7 @@ module.exports = {
             });
         });
     },  
-    //static connect number in array 
+    //statics connect number in array 
     staticConnectNo: (source)=>{
         //排序
         source.sort((a,b)=>(a-b))
@@ -75,7 +75,16 @@ module.exports = {
         }
       
         return static.map((val,idx)=>({connect:(idx+1),times:val}))
-      },  
+      },
+    //暫停
+    pause: async (msg) => {
+        if (msg && msg != '') console.log(msg)
+        process.stdin.setRawMode(true)
+        return new Promise(resolve => process.stdin.once('data', () => {
+          process.stdin.setRawMode(false)
+          resolve()
+        }))
+    },  
   };
 
 
