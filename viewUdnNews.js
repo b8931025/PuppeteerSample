@@ -5,7 +5,9 @@ const fs = require('fs');
 const util = require('./Util.js');
 const pageSize = 20;
 
-const keypress = async () => {
+//暫停
+const pause = async () => {
+    console.log('<<按任意鍵下一頁>>')
     process.stdin.setRawMode(true)
     return new Promise(resolve => process.stdin.once('data', () => {
       process.stdin.setRawMode(false)
@@ -122,8 +124,7 @@ const downloadNews = async(dir)=>{
         const element = allList[i]
         console.log(element.no,element.title,element.url)
         if (((i+1) % pageSize) == 0){
-            console.log('按任意鍵下一頁');
-            await keypress();
+            await pause();
         }
     }
     process.exit();
@@ -148,8 +149,7 @@ const showList = async(dir)=>{
         const element = newsData[i]
         console.log(element.no,element.title,element.url)
         if (((i+1) % pageSize) == 0 && (i+1) != newsData.length){
-            console.log('按任意鍵下一頁');
-            await keypress();
+            await pause();
         }
     }
     process.exit();
