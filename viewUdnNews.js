@@ -3,17 +3,7 @@ const puppeteer = require('puppeteer');
 const utilityDatetime = require('./datetime.js');
 const fs = require('fs');
 const util = require('./Util.js');
-const pageSize = 20;
-
-//暫停
-const pause = async () => {
-    console.log('<<按任意鍵下一頁>>')
-    process.stdin.setRawMode(true)
-    return new Promise(resolve => process.stdin.once('data', () => {
-      process.stdin.setRawMode(false)
-      resolve()
-    }))
-  }
+const pageSize = 10;
 
 //下載新聞清單
 const downloadNews = async(dir)=>{
@@ -122,7 +112,7 @@ const downloadNews = async(dir)=>{
     //listing
     for(let i = 0; i < allList.length; i++){
         const element = allList[i]
-        console.log(element.no,element.title,element.url)
+        console.log(element.no,element.title)
         if (((i+1) % pageSize) == 0){
             await util.pause('<<按任意鍵下一頁>>');
         }
@@ -147,7 +137,7 @@ const showList = async(dir)=>{
     const newsData = await getNewsData(dir);
     for(let i = 0; i < newsData.length; i++){
         const element = newsData[i]
-        console.log(element.no,element.title,element.url)
+        console.log(element.no,element.title)
         if (((i+1) % pageSize) == 0 && (i+1) != newsData.length){
             await util.pause('<<按任意鍵下一頁>>');
         }
@@ -161,7 +151,9 @@ const readNews = async(dir,newsNo)=>{
     let news = newsData.filter(x => x.no == newsNo)
     if (news && news.length > 0){
         let url = news[0].url
-        console.log('讀取中...')
+        let title = news[0].title
+        console.log(`${title}   [${url}]`)
+        console.log(`讀取中...`)
         util.execCmd("node", ['./getWebsite.js',url]);
     }
 }
