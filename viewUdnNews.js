@@ -3,9 +3,18 @@ const puppeteer = require('puppeteer');
 const utilityDatetime = require('./datetime.js');
 const fs = require('fs');
 const util = require('./Util.js');
+const pageSize = 20;
 
-(async ()=>{
-    var dir = `${__dirname}\\log\\`;
+const keypress = async () => {
+    process.stdin.setRawMode(true)
+    return new Promise(resolve => process.stdin.once('data', () => {
+      process.stdin.setRawMode(false)
+      resolve()
+    }))
+  }
+
+//下載新聞清單
+const downloadNews = async(dir)=>{
     var now = utilityDatetime.yyyymmddhhmmss();
     if (!fs.existsSync(dir))fs.mkdirSync(dir);
     let imgName = dir + now + ".png";
@@ -23,6 +32,8 @@ const util = require('./Util.js');
     let subList = []
     let hrefList = []
     let tmpList = []
+
+    console.log('下載中...')
 
     //首頁
     url = 'https://udn.com/NEWS/main.html'
@@ -104,6 +115,94 @@ const util = require('./Util.js');
     util.saveFile(fileName, JSON.stringify(allList).replace(/,{/g,",\n{"))
 
     //開啟檔案
-    util.execCmd("explorer", [fileName]);
-})()
+    //util.execCmd("explorer", [fileName]);
 
+    //listing
+    for(let i = 0; i < allList.length; i++){
+        const element = allList[i]
+        console.log(element.no,element.title,element.url)
+        if (((i+1) % pageSize) == 0){
+            console.log('按任意鍵下一頁');
+            await keypress();
+        }
+    }
+    process.exit();
+}
+
+//取得最新清單
+const getNewsData = async(dir)=>{
+    let txtList = await fs.readdirSync(dir);
+    let fileName = txtList.filter(x => x.startsWith('202') && x.indexOf('.txt') > -1).sort().pop()
+    if (!fileName) throw '尚未下載新聞清單'
+
+    fileName = `${dir}/${fileName}`
+    let content = await fs.readFileSync(`${fileName}`,{encoding:"utf-8"})
+    let newsData = JSON.parse(content);
+    return newsData;
+}
+
+//列出清單
+const showList = async(dir)=>{
+    const newsData = await getNewsData(dir);
+    for(let i = 0; i < newsData.length; i++){
+        const element = newsData[i]
+        console.log(element.no,element.title,element.url)
+        if (((i+1) % pageSize) == 0 && (i+1) != newsData.length){
+            console.log('按任意鍵下一頁');
+            await keypress();
+        }
+    }
+    process.exit();
+}
+
+//讀取新聞
+const readNews = async(dir,newsNo)=>{
+    const newsData = await getNewsData(dir);
+    let news = newsData.filter(x => x.no == newsNo)
+    if (news && news.length > 0){
+        let url = news[0].url
+        console.log('讀取中...')
+        util.execCmd("node", ['./getWebsite.js',url]);
+    }
+}
+
+(async ()=>{
+    let logPath = 'log';
+    let dir = `${__dirname}\\${logPath}\\`;
+    console.clear()
+
+    try{
+        //是否有加參數
+        if (process.argv.length <= 2) {
+            throw '--download 下載新聞\n--list 列出清單\n--read NO 讀取新聞'
+        }
+        
+        let optionCount = 0
+        //--list 列出新聞清單
+        const idxList = process.argv.indexOf("--list");
+        if (idxList > -1)optionCount++
+
+        //--read No 顯示新聞內容
+        const idxRead = process.argv.indexOf("--read");
+        if (process.argv.length < (idxRead + 2)) throw "optional is not enough"
+        const newsNo = (idxRead > -1) ? process.argv[idxRead + 1] : ""
+        if (idxRead > -1)optionCount++
+
+        //--download 下載新聞
+        const idxDownload = process.argv.indexOf("--download");
+        if (idxDownload > -1)optionCount++
+
+        if (optionCount > 1) throw "optional syntax is not valid";
+
+        if (idxDownload > -1){
+            await downloadNews(dir);
+            await showList(dir);
+        }else if(idxList > -1){
+            showList(dir);
+        }else if(idxRead > -1){
+            readNews(dir,newsNo);
+        }
+    }catch(e){
+        console.log(e)
+    }
+})()
