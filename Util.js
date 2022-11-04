@@ -6,9 +6,9 @@ module.exports = {
             mode: 0o666
         }    
     */
-    saveFile : (path,value,options)=>{
+    saveFile : async(path,value,options)=>{
         let callback = (err) => {if (err) return console.log(err)}
-        require('fs').writeFile(path, value, options, callback);
+        await require('fs').writeFileSync(path, value, options, callback);
     },
     //delay ms
     sleep : (delay)=>{

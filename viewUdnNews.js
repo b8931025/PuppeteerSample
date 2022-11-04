@@ -4,6 +4,7 @@ const utilityDatetime = require('./datetime.js');
 const fs = require('fs');
 const util = require('./Util.js');
 const pageSize = 10;
+let pageMode = false;
 
 //下載新聞清單
 const downloadNews = async(dir)=>{
@@ -104,7 +105,7 @@ const downloadNews = async(dir)=>{
     allList = allList.map((val,idx)=>{return {no:(idx+1),title:val.title,url:val.url}})
 
     //存檔
-    util.saveFile(fileName, JSON.stringify(allList).replace(/,{/g,",\n{"))
+    await util.saveFile(fileName, JSON.stringify(allList).replace(/,{/g,",\n{"))
 
     //開啟檔案
     //util.execCmd("explorer", [fileName]);
@@ -113,7 +114,7 @@ const downloadNews = async(dir)=>{
     for(let i = 0; i < allList.length; i++){
         const element = allList[i]
         console.log(element.no,element.title)
-        if (((i+1) % pageSize) == 0){
+        if (pageMode && ((i+1) % pageSize) == 0 && (i+1) != allList.length){
             await util.pause('<<按任意鍵下一頁>>');
         }
     }
@@ -138,7 +139,7 @@ const showList = async(dir)=>{
     for(let i = 0; i < newsData.length; i++){
         const element = newsData[i]
         console.log(element.no,element.title)
-        if (((i+1) % pageSize) == 0 && (i+1) != newsData.length){
+        if (pageMode && ((i+1) % pageSize) == 0 && (i+1) != newsData.length){
             await util.pause('<<按任意鍵下一頁>>');
         }
     }
@@ -152,7 +153,8 @@ const readNews = async(dir,newsNo)=>{
     if (news && news.length > 0){
         let url = news[0].url
         let title = news[0].title
-        console.log(`${title}   [${url}]`)
+        console.log(`${title}`)
+        console.log(`${url}`)
         console.log(`讀取中...`)
         util.execCmd("node", ['./getWebsite.js',url]);
     }
@@ -183,6 +185,10 @@ const readNews = async(dir,newsNo)=>{
         //--download 下載新聞
         const idxDownload = process.argv.indexOf("--download");
         if (idxDownload > -1)optionCount++
+
+        //--page 分頁顯示
+        const idxPage = process.argv.indexOf("--page");
+        if (idxPage > -1) pageMode = true;
 
         if (optionCount > 1) throw "optional syntax is not valid";
 
