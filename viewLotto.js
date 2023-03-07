@@ -133,8 +133,8 @@ function staticLotto(period,listTotal){
                     
     result.push(`推薦號碼`)
     result.push(AdviceNOSet(PickSet,statics))
-    result.push(AdviceNOSet(PickSet,statics))    
-    result.push(AdviceNOSet(PickSet,statics))    
+    result.push(AdviceNOSet(PickSet,statics))
+    result.push(AdviceNOSet(PickSet,statics))
 
     return result;
 }
@@ -142,12 +142,21 @@ function staticLotto(period,listTotal){
 //推薦號碼
 function AdviceNOSet(PickSet,statics){
     let newNumber= [];
+    let NowTimes = 0;
     PickSet.forEach(set => {
-        let TimesArray = statics.filter(y => y.count == set.times);
-        //亂數排序
-        let RandomArray = TimesArray.sort((a,b)=>(0.5 - Math.random()));
-
-        for(let i = 0;i < set.amount;i++) newNumber.push(RandomArray[i].no);
+        if (set.amount > 0){
+            NowTimes = set.times;
+            let TimesArray = statics.filter(y => y.count == NowTimes);
+            //該出現次數的號碼不夠，就往下一個次數少的號碼找
+            if (TimesArray.length < set.amount) TimesArray.push(statics.filter(y => y.count == NowTimes--));
+            //該出現次數的號碼不夠，就往下一個次數少的號碼找
+            if (TimesArray.length < set.amount) TimesArray.push(statics.filter(y => y.count == NowTimes--));
+            //亂數排序
+            let RandomArray = TimesArray.sort((a,b)=>(0.5 - Math.random()));
+    
+            //某個排名的號碼組數，不足PickSet的數量會出錯
+            for(let i = 0;i < set.amount;i++)  newNumber.push(RandomArray[i].no);
+        }
     })
     //排序(小 > 大)
     return newNumber.sort((a,b)=>(parseInt(a) > parseInt(b)) ? 1 : (parseInt(a) < parseInt(b)) ? -1 : 0).join(',');
